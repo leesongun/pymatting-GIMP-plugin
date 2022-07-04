@@ -90,11 +90,6 @@ def drawableData(drawable):
     
     #GObject.Object.unref(buffer)
     return src_pixels
-    
-# def drawableData_workaround(drawable):
-#     if drawable.is_rgb():
-#     if drawable.type():
-
 
 def createResultLayer(image,name,result):
     rlBytes=np.uint8(result).tobytes();
@@ -105,8 +100,8 @@ def createResultLayer(image,name,result):
     gimp.displays_flush()
 
 def cutout(procedure, run_mode, image, n_drawables, drawables, args, data):
-    config = procedure.create_config()
-    config.begin_run(image, run_mode, args)
+    #config = procedure.create_config()
+    #config.begin_run(image, run_mode, args)
     
     if run_mode == Gimp.RunMode.INTERACTIVE:
         GimpUi.init('pymatting')
@@ -130,7 +125,8 @@ def cutout(procedure, run_mode, image, n_drawables, drawables, args, data):
     F,B = decompose(combined, trimap)
     F = numpy_to_layer(image, F)
     F.set_name("foreground")
-    #numpy_to_layer(B)
+    B = numpy_to_layer(image, B)
+    B.set_name("background")
     
     image.insert_layer(F, drawables[0].get_parent(), image.get_item_position(drawables[0]))
     image.insert_layer(B, drawables[0].get_parent(), image.get_item_position(drawables[0]))
@@ -141,7 +137,7 @@ def cutout(procedure, run_mode, image, n_drawables, drawables, args, data):
     image.undo_group_end()
     Gimp.context_pop()
 
-    config.end_run(Gimp.PDBStatusType.SUCCESS)
+    #config.end_run(Gimp.PDBStatusType.SUCCESS)
 
     return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
