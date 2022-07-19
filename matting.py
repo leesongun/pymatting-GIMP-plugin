@@ -37,6 +37,8 @@ from pymatting.alpha.estimate_alpha_cf import estimate_alpha_cf
 from pymatting.foreground.estimate_foreground_ml import estimate_foreground_ml
 import numpy
 
+# convert to linear RGB
+
 def decompose(image, trimap):
     if image.shape[:2] != trimap.shape[:2]:
         raise ValueError("Input image and trimap must have same size")
@@ -78,6 +80,22 @@ def channelData(layer):
     pixChars=region[:,:] # Take whole layer
     bpp=region.bpp
     return np.frombuffer(pixChars,dtype=np.uint8).reshape(len(pixChars)/bpp,bpp)
+
+# srgb to linear rgb, assumes [0,1]
+# divide by 255.0 in this case
+@np.vectorize
+def srgb2rgb (srgb):
+    if srgb <= 0.0404482362771082:
+        return srgb/12.92
+    else:
+        return ((srgb + 0.055) / 1.055)**2.4
+
+@np.vectorize
+def rgb2srgb(lin):
+    if lin <= 0.00313066844250063:
+    	return 12.92 * lin
+    else:
+        return 1.055 * (pow(lin, (1.0 / 2.4))) - 0.055
 
 def drawableData(drawable):
     width = drawable.get_width()
